@@ -87,10 +87,10 @@ export default function AgendaPage() {
   const [turno, setTurno] = useState<any>({
     paciente_id: "",
     reason: "",
-    status: "pending",
+    status: "",
     durationMin: 30,
     fechaStr: "",
-    horaStr: "09:00",
+    horaStr: "",
   });
 
   useEffect(() => {
@@ -200,7 +200,7 @@ useEffect(() => {
     return (
       <div className="grid grid-cols-7 gap-1">
         {["L", "M", "M", "J", "V", "S", "D"].map((day, i) => (
-          <div key={`h-${i}`} className="text-[10px] font-black text-slate-500 text-center py-2 uppercase tracking-widest">{day}</div>
+          <div key={`h-${i}`} className="text-[12px] font-black text-slate-500 text-center py-2 uppercase tracking-widest">{day}</div>
         ))}
         {cells.map((d, i) => {
           if (!d) return <div key={`e-${i}`} />;
@@ -214,7 +214,7 @@ useEffect(() => {
             <button
               key={`d-${i}`}
               onClick={() => setSelectedDate(new Date(y, selectedDate.getMonth(), d))}
-              className={`relative h-9 w-full rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+              className={`relative h-9 w-full rounded-xl text-xl font-bold transition-all flex items-center justify-center ${
                 isSelected 
                   ? "bg-amber-600 text-white shadow-lg shadow-amber-950/50 font-black scale-105 border border-amber-500/30" 
                   : "hover:bg-slate-800 text-slate-300"
@@ -236,7 +236,7 @@ useEffect(() => {
       <AnimatePresence>{toastMsg && <Toast message={toastMsg} />}</AnimatePresence>
 
       {/* ASIDE RESPONSIVO (BARBER INTERFACE) */}
-      <aside className="w-full md:w-80 bg-[#161920] border-b md:border-b-0 md:border-r border-slate-800/60 p-6 flex flex-col gap-6 md:sticky md:top-0 md:h-screen z-10">
+      <aside className="w-full md:w-80 bg-[#161920] border-b lg:border-b-0 md:border-r border-slate-800/60 p-6 flex flex-col gap-6 md:sticky md:top-0 md:h-screen z-10">
         <div className="flex items-center gap-3 relative">
           <div className="absolute top-[-24px] left-[-24px] right-[-24px] h-[3px] bg-gradient-to-r from-red-600 via-white to-blue-600 opacity-50 md:block hidden" />
           <div className="bg-amber-600/10 border border-amber-500/20 p-2.5 rounded-xl text-amber-500 shadow-inner">
@@ -247,7 +247,7 @@ useEffect(() => {
         
         <div className="flex items-center justify-between bg-[#12141a] p-1.5 rounded-xl border border-slate-800/80">
           <button onClick={() => cambiarMes(-1)} className="p-2 hover:bg-[#1d222e] rounded-lg text-slate-400 transition-all active:scale-95"><ChevronLeft className="w-4 h-4" /></button>
-          <p className="font-black text-slate-200 capitalize text-xs tracking-wider">
+          <p className="font-black text-slate-200 capitalize text-x tracking-wider">
             {selectedDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" })}
           </p>
           <button onClick={() => cambiarMes(1)} className="p-2 hover:bg-[#1d222e] rounded-lg text-slate-400 transition-all active:scale-95"><ChevronRight className="w-4 h-4" /></button>

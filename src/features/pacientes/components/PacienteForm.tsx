@@ -33,7 +33,6 @@ export default function PacienteForm({ initial, onSubmit, onCancel }: Props) {
   function validate(): boolean {
     const e: Record<string, string> = {}
     if (!nombre.trim()) e.nombre = "El nombre es obligatorio."
-    if (!apellido.trim()) e.apellido = "El apellido es obligatorio."
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -58,7 +57,6 @@ useEffect(() => {
     if (!validate()) return;
     
 
-    // 💡 SOLUCIÓN CRÍTICA: Construimos el payload enviando ÚNICAMENTE lo que tu API soporta
     const payload: PacienteInput = {
       nombre: nombre.trim(),
       apellido: apellido.trim(),
@@ -92,7 +90,7 @@ useEffect(() => {
               {errors.nombre && <span className="text-[10px] text-rose-400 font-bold ml-1 italic tracking-wide">{errors.nombre}</span>}
             </div>
             <div className="space-y-1.5">
-              <label className={labelCls}><User className="w-3.5 h-3.5 text-slate-500"/> Apellido *</label>
+              <label className={labelCls}><User className="w-3.5 h-3.5 text-slate-500"/> Apellido </label>
               <input className={fieldCls("apellido")} value={apellido} onChange={(e) => setApellido(e.target.value)} placeholder="Ej: Pérez" />
               {errors.apellido && <span className="text-[10px] text-rose-400 font-bold ml-1 italic tracking-wide">{errors.apellido}</span>}
             </div>

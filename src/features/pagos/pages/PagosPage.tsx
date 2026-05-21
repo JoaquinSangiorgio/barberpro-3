@@ -204,8 +204,8 @@ export default function PagosPage() {
       />
 
       {/* HEADER */}
-      <header className="w-full md:pl-64 bg-[#161920] text-white px-6 py-10 shadow-xl border-b border-slate-800/40 shrink-0">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <header className="w-full lg:pl-64 bg-[#161920] text-white px-6 py-10 shadow-xl border-b border-slate-800/40 shrink-0">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center space-x-5">
             <div className="bg-amber-600/10 p-4 rounded-2xl border border-amber-500/20">
               <Activity className="w-9 h-9 text-amber-500" />
@@ -216,7 +216,7 @@ export default function PagosPage() {
             </div>
           </motion.div>
 
-          <div className="flex flex-col gap-3 w-full md:w-auto">
+          <div className="flex flex-col gap-3 w-full lg:w-auto">
             {/* Row 1: search + botones */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <input
@@ -293,11 +293,11 @@ export default function PagosPage() {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 w-full md:pl-64 p-6 mt-6 bg-[#0f1115]">
+      <main className="flex-1 w-full lg:pl-64 p-6 mt-6 bg-[#0f1115]">
         <div className="max-w-7xl mx-auto">
 
           {/* TABLA DESKTOP */}
-          <div className="hidden md:block overflow-hidden bg-[#161920] rounded-[2.5rem] shadow-2xl border border-slate-800/80">
+          <div className="hidden lg:block overflow-hidden bg-[#161920] rounded-[2.5rem] shadow-2xl border border-slate-800/80">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#12141a] border-b border-slate-800">
@@ -370,17 +370,17 @@ export default function PagosPage() {
           </div>
 
           {/* CARDS MOBILE */}
-          <div className="md:hidden space-y-4">
+          <div className="lg:hidden space-y-4">
             {filtered.map((p) => (
               <motion.div
                 key={p.id}
-                className={`bg-[#161920] p-5 rounded-3xl shadow-md border border-slate-800/80 space-y-3 ${p.cerrado ? "opacity-50" : ""}`}
+                className={`bg-[#161920] p-5 rounded-3xl shadow-lg border border-slate-800/80 space-y-3 ${p.cerrado ? "opacity-50" : ""}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
                       {p.barbero && (
-                        <span className="text-[10px] font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 uppercase tracking-wider">
+                        <span className="text-[10px] font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20 uppercase tracking-wider">
                           {p.barbero}
                         </span>
                       )}

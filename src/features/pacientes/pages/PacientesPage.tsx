@@ -120,10 +120,10 @@ export default function PacientesPage() {
       />
 
       {/* HEADER ESTILO AGENDA (COLORES CAMBIADOS A BARBER SHOP) */}
-      <header className="w-full md:pl-64 bg-[#161920] border-b border-amber-900/15 text-slate-100 px-8 py-12 shadow-xl relative overflow-hidden">
+      <header className="w-full lg:pl-64 bg-[#161920] border-b border-amber-900/15 text-slate-100 px-8 py-12 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-red-600 via-white to-blue-600 opacity-50" />
         
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
           <div className="flex items-center space-x-5">
             <div className="bg-amber-600/10 border border-amber-500/20 p-4 rounded-2xl text-amber-500 shadow-inner">
               <UsersIcon className="w-10 h-10" />

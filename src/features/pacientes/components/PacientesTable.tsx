@@ -21,9 +21,7 @@ export default function PacientesTable({ data, onEdit, onDelete }: Props) {
             <div className="font-medium">
               {p.apellido}, {p.nombre}
             </div>
-            <div className="text-sm text-gray-600">
-              <strong>DNI:</strong> {p.dni || "-"}
-            </div>
+            
             <div className="text-sm text-gray-600">
               <strong>Email:</strong> {p.email || "-"}
             </div>
@@ -66,7 +64,7 @@ export default function PacientesTable({ data, onEdit, onDelete }: Props) {
           <thead>
             <tr className="border-b bg-gray-50 text-left text-gray-700">
               <th className="px-4 py-2 whitespace-nowrap">Nombre</th>
-              <th className="px-4 py-2 whitespace-nowrap">DNI</th>
+             
               <th className="px-4 py-2 whitespace-nowrap">Email</th>
               <th className="px-4 py-2 whitespace-nowrap">Teléfono</th>
               <th className="px-4 py-2 whitespace-nowrap">Alta</th>
@@ -89,7 +87,6 @@ export default function PacientesTable({ data, onEdit, onDelete }: Props) {
                 <td className="px-4 py-2 whitespace-nowrap">
                   {p.apellido}, {p.nombre}
                 </td>
-                <td className="px-4 py-2 whitespace-nowrap">{p.dni || "-"}</td>
                 <td className="px-4 py-2">{p.email || "-"}</td>
                 <td className="px-4 py-2 whitespace-nowrap">{p.telefono || "-"}</td>
                 <td className="px-4 py-2 whitespace-nowrap">

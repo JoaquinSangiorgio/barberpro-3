@@ -63,7 +63,7 @@ export default function AppointmentDialog({
       professional: initial?.professional || (professionals[0] || "Dra. Analia"),
       title: initial?.title || "Turno",
       reason: initial?.reason || "",
-      location: initial?.location || "Consultorio 1",
+      location: initial?.location || "",
       durationMin: initial?.durationMin || 30,
       status: initial?.status || "pending",
       date: toDateInputValue(safeDate),
@@ -84,6 +84,19 @@ export default function AppointmentDialog({
   const [date, setDate] = useState(def.date);
   const [time, setTime] = useState(def.time);
   const [err, setErr] = useState<string | null>(null);
+
+
+   //bloqueo de scroll de pagina al abrir dialog
+useEffect(() => {
+  const originalStyle = window.getComputedStyle(document.body).overflow;
+  
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.body.style.overflow = originalStyle;
+  };
+}, []);
+
 
 
 useEffect(() => {

@@ -12,7 +12,7 @@ function App() {
   return (
     <Router>
       
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-[#0f1115]">
         {/* Navbar fijo */}
         <Navbar />
 <ScrollToTop />

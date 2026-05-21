@@ -155,10 +155,10 @@ useEffect(() => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-slate-50 flex flex-col">
       {/* HEADER ADAPTADO A PALETA BARBER (SÓLO CAMBIO DE COLOR) */}
-      <header className="w-full md:pl-64 bg-[#161920] text-white shadow-xl border-b border-slate-800/40 relative overflow-hidden">
+      <header className="w-full lg:pl-64 bg-[#161920] text-white shadow-xl border-b border-slate-800/40 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-red-600 via-white to-blue-600 opacity-50" />
         
-        <div className="max-w-7xl mx-auto px-8 py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-8 py-14 flex flex-col lg:flex-row md:items-center md:justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <h1 className="text-4xl font-black flex items-center gap-3 tracking-tight text-amber-500 uppercase">
               <Activity className="w-10 h-10 text-amber-500 animate-pulse" /> Resumen General

@@ -26,7 +26,7 @@ export default function AppLayout() {
     <div className="min-h-screen flex bg-[#0f1115]">
 
       {/* ── SIDEBAR DESKTOP ── */}
-      <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-64 flex-col bg-slate-900 text-gray-200 shadow-lg">
+      <aside className="hidden lg:flex fixed left-0 top-0 z-40 h-screen w-64 flex-col bg-slate-900 text-gray-200 shadow-lg">
         <div className="h-16 px-4 flex items-center justify-between border-b border-gray-700">
           <span className="font-bold text-amber-400 text-lg tracking-tight uppercase">BarberPRO</span>
           <button
@@ -45,7 +45,7 @@ export default function AppLayout() {
               to={i.to}
               end={i.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors duration-150 relative ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-150 relative ${
                   isActive
                     ? "bg-amber-600/20 text-amber-400 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-amber-400 before:rounded-r"
                     : "text-gray-400 hover:bg-slate-800 hover:text-white"
@@ -60,11 +60,11 @@ export default function AppLayout() {
       </aside>
 
       {/* ── CONTENIDO PRINCIPAL ── */}
-      <div className="flex-1 md:pl-64 flex flex-col">
+      <div className="flex-1 lg:pl-64 flex flex-col">
 
         {/* Header mobile — se expande hacia arriba para cubrir la muesca/notch */}
         <header
-          className="sticky top-0 z-30 bg-[#161920] border-b border-slate-800/60 flex flex-col md:hidden"
+          className="sticky top-0 z-30 bg-[#161920] border-b border-slate-800/60 flex flex-col lg:hidden"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="h-14 flex items-center justify-between px-5">
@@ -86,7 +86,7 @@ export default function AppLayout() {
             md:hidden lo elimina en desktop sin conflictos de especificidad.
           */}
           <div
-            className="md:hidden"
+            className="lg:hidden"
             style={{ height: 'calc(4rem + env(safe-area-inset-bottom))' }}
             aria-hidden="true"
           />
@@ -103,7 +103,7 @@ export default function AppLayout() {
         Los tabs viven en la fila interior h-16, siempre por encima del indicador.
       */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#161920] border-t border-slate-800/80"
+        className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#161920] border-t border-slate-800/80"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="h-16 flex">

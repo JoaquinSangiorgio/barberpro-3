@@ -135,7 +135,7 @@ export default function StockPage() {
       />
 
       {/* HEADER: Adaptado a paleta Barber Shop Dark */}
-      <header className="w-full md:pl-64 bg-[#161920] border-b border-slate-800/40 text-white px-6 py-10 shadow-xl shrink-0 relative overflow-hidden">
+      <header className="w-full lg:pl-64 bg-[#161920] border-b border-slate-800/40 text-white px-6 py-10 shadow-xl shrink-0 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-red-600 via-white to-blue-600 opacity-50" />
         
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
@@ -149,8 +149,8 @@ export default function StockPage() {
             </div>
           </div>
           
-          <div className="flex w-full md:w-auto gap-2">
-             <div className="relative flex-1 md:w-64">
+          <div className="flex w-full lg:w-auto gap-2">
+             <div className="relative flex-1 lg:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                 <input 
                   type="text"
@@ -172,11 +172,11 @@ export default function StockPage() {
       </header>
 
       {/* MAIN CONTENT: Corregido espaciado y flexbox para extender fondo sin cortes */}
-      <main className="flex-1 w-full md:pl-64 p-6 mt-6 bg-[#0f1115]">
+      <main className="flex-1 w-full lg:pl-64 p-6 mt-6 bg-[#0f1115]">
         <div className="max-w-7xl mx-auto">
           
           {/* VISTA DESKTOP */}
-          <div className="hidden md:block bg-[#161920] rounded-[2.5rem] shadow-2xl border border-slate-800/80 overflow-hidden">
+          <div className="hidden lg:block bg-[#161920] rounded-[2.5rem] shadow-2xl border border-slate-800/80 overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#12141a] border-b border-slate-800">
@@ -223,7 +223,7 @@ export default function StockPage() {
           </div>
 
           {/* VISTA MOBILE */}
-          <div className="md:hidden space-y-4">
+          <div className="lg:hidden space-y-4">
             {filteredItems.map((item) => {
               const esBajo = item.cantidad <= item.minimo;
               return (
