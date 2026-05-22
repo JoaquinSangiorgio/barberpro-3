@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import type { Pago, PacienteLite } from "../services/payments.api";
-import type { Barbero } from "../services/barberos.api";
+import type { Barbero, ServicioBarberia } from "../../ajustes/services/ajustesService";
 
 const SIN_TURNO_ID = "sin_turno";
 
 type Props = {
   initial?: Pago;
   pacientes: PacienteLite[];
-  barberos: Barbero[];
+  barberos: Barbero[]; // Recibe la lista completa con comisión e isActive de Ajustes
+  servicios: ServicioBarberia[]; // Recibe la lista de servicios de Ajustes
   onSave: (p: Omit<Pago, "id"> | Pago) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   onCancel: () => void;
@@ -17,31 +18,40 @@ type Props = {
 };
 
 export default function PaymentDialog({
-  initial, pacientes, barberos, onSave, onDelete, onCancel,
+  initial, pacientes, barberos, servicios, onSave, onDelete, onCancel,
 }: Props) {
   const [pacienteId, setPacienteId] = useState<string>(
     initial?.paciente_id ? String(initial.paciente_id) : SIN_TURNO_ID,
   );
   const [fecha, setFecha] = useState(initial?.fecha ?? new Date().toISOString().split("T")[0]);
   const [metodo, setMetodo] = useState<string>(initial?.metodo ?? "Efectivo");
-  const [concepto, setConcepto] = useState(initial?.concepto ?? "Corte");
+  
+  // Estados para la automatización de la lista de precios de Ajustes
+  const [servicioId, setServicioId] = useState<string>("");
+  const [concepto, setConcepto] = useState(initial?.concepto ?? "");
   const [monto, setMonto] = useState<string>(initial?.monto ? String(initial.monto) : "");
   const [status, setStatus] = useState<Pago["status"]>(initial?.status ?? "approved");
-  const [barbero, setBarbero] = useState<string>(initial?.barbero ?? "");
-
   
-//bloqueo de scroll de pagina al abrir dialog
-useEffect(() => {
-  const originalStyle = window.getComputedStyle(document.body).overflow;
-  
-  document.body.style.overflow = "hidden";
+  // Inicialización inteligente del ID del barbero para soportar registros viejos (strings) y nuevos (IDs)
+  const [barberId, setBarberId] = useState<string>(() => {
+    if (initial?.barberId) return initial.barberId;
+    if (initial?.barbero) {
+      const encontrado = barberos.find(b => b.name.toLowerCase() === initial.barbero?.toLowerCase());
+      return encontrado?.id ?? "";
+    }
+    return "";
+  });
 
-  return () => {
-    document.body.style.overflow = originalStyle;
-  };
-}, []);
+  // Bloqueo de scroll del body al abrir el diálogo (Crucial para UX en tablets)
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
 
-
+  // Sincronización al editar un registro existente
   useEffect(() => {
     if (initial) {
       setPacienteId(String(initial.paciente_id));
@@ -50,15 +60,45 @@ useEffect(() => {
       setConcepto(initial.concepto);
       setMonto(initial.monto ? String(initial.monto) : "");
       setStatus(initial.status);
-      setBarbero(initial.barbero ?? "");
+      setServicioId(initial.serviceId ?? "");
+      
+      // Resolución de ID retrocompatible para el selector
+      if (initial.barberId) {
+        setBarberId(initial.barberId);
+      } else if (initial.barbero) {
+        const encontrado = barberos.find(b => b.name.toLowerCase() === initial.barbero?.toLowerCase());
+        setBarberId(encontrado?.id ?? "");
+      } else {
+        setBarberId("");
+      }
     }
-  }, [initial]);
+  }, [initial, barberos]);
+
+  // Manejador del cambio de servicio: auto-rellena concepto y precio base
+  const handleServicioChange = (id: string) => {
+    setServicioId(id);
+    const svc = servicios.find(s => s.id === id);
+    if (svc) {
+      setConcepto(svc.name);
+      setMonto(String(svc.price));
+    } else {
+      setConcepto("");
+      setMonto("");
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const esSinTurno = pacienteId === SIN_TURNO_ID;
     const pac = pacientes.find((p) => String(p.id) === pacienteId);
+    const barberoSeleccionado = barberos.find((b) => b.id === barberId);
+    
+    const finalMonto = Number(monto) || 0;
+
+    // Cálculo automático de la porción de dinero del empleado
+    const porcentajeComision = barberoSeleccionado?.commissionPercentage ?? 50;
+    const comisionCalculada = (finalMonto * porcentajeComision) / 100;
 
     const payload: any = {
       paciente_id: pacienteId,
@@ -68,9 +108,12 @@ useEffect(() => {
       fecha,
       metodo,
       concepto,
-      monto: Number(monto) || 0,
+      serviceId: servicioId || undefined,
+      monto: finalMonto,
       status,
-      barbero: barbero.trim() || undefined,
+      barberId: barberId || undefined,
+      barbero: barberoSeleccionado?.name ?? undefined, // Nombre plano denormalizado para listados rápidos
+      comisionBarbero: comisionCalculada, // Impacta directo en el Cierre de Caja
     };
 
     if (initial?.id) {
@@ -80,17 +123,22 @@ useEffect(() => {
     }
   }
 
+  // Si es un NUEVO corte, ocultamos los barberos desactivados para que no se elijan por error
+  const barberosFiltrados = initial 
+    ? barberos 
+    : barberos.filter(b => b.isActive);
+
   return (
     <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4">
       <div className="bg-[#161920] w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 relative max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col">
         <div className="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
 
-        {/* Barra de arrastre mobile */}
+        {/* Indicador visual táctil para celulares */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
           <div className="w-10 h-1 rounded-full bg-slate-700" />
         </div>
 
-        {/* Header */}
+        {/* Encabezado */}
         <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-[#12141a] shrink-0">
           <h2 className="text-base font-black text-slate-100 uppercase tracking-wide">
             {initial ? "Editar Registro" : "Nuevo Pago"}
@@ -100,46 +148,30 @@ useEffect(() => {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
+        {/* Cuerpo del Formulario */}
+        <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1 token-custom-scrollbar">
 
-          {/* Barbero — campo principal del flujo de barbería */}
+          {/* Selector de Barberos */}
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
               Barbero *
             </label>
-            {barberos.length > 0 ? (
-              <select
-                value={barbero}
-                onChange={(e) => setBarbero(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm"
-              >
-                <option value="" className="bg-[#161920]">Seleccionar barbero...</option>
-                {barberos.map((b) => (
-                  <option key={b.id} value={b.nombre} className="bg-[#161920]">
-                    {b.nombre}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={barbero}
-                onChange={(e) => setBarbero(e.target.value)}
-                placeholder="Nombre del barbero..."
-                required
-                className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm placeholder:text-slate-700"
-              />
-            )}
-            {barberos.length === 0 && (
-              <p className="text-[10px] text-slate-600 mt-1 ml-1">
-                Agregá barberos desde el Cierre de Caja para usar un selector
-              </p>
-            )}
+            <select
+              value={barberId}
+              onChange={(e) => setBarberId(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm"
+            >
+              <option value="" className="bg-[#161920]">Seleccionar barbero...</option>
+              {barberosFiltrados.map((b) => (
+                <option key={b.id} value={b.id} className="bg-[#161920]">
+                  {b.name} ({b.commissionPercentage}%)
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Cliente */}
+          {/* Selector de Clientes */}
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
               Cliente
@@ -149,7 +181,6 @@ useEffect(() => {
               onChange={(e) => setPacienteId(e.target.value)}
               className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm"
             >
-              {/* Opción por defecto siempre presente */}
               <option value={SIN_TURNO_ID} className="bg-[#161920]">
                 Cliente sin turno
               </option>
@@ -159,6 +190,40 @@ useEffect(() => {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Selector de Servicios / Conceptos de Ajustes */}
+          <div>
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+              Servicio / Concepto *
+            </label>
+            <select
+              value={servicioId}
+              onChange={(e) => setServicioId(e.target.value)}
+              onInput={(e) => handleServicioChange((e.target as HTMLSelectElement).value)}
+              required={servicios.length > 0}
+              className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm"
+            >
+              <option value="" className="bg-[#161920]">Seleccionar servicio del local...</option>
+              {servicios.map((s) => (
+                <option key={s.id} value={s.id} className="bg-[#161920]">
+                  {s.name} — ${s.price.toLocaleString("es-AR")}
+                </option>
+              ))}
+              <option value="custom" className="bg-[#161920]">Otro concepto / Monto personalizado</option>
+            </select>
+
+            {/* Input secundario dinámico para conceptos libres */}
+            {servicioId === "custom" && (
+              <input
+                type="text"
+                value={concepto}
+                onChange={(e) => setConcepto(e.target.value)}
+                placeholder="Ej: Venta de Pomada, Alisado..."
+                required
+                className="w-full mt-2 px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm placeholder:text-slate-700 animate-in fade-in duration-200"
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -176,7 +241,7 @@ useEffect(() => {
               />
             </div>
 
-            {/* Monto */}
+            {/* Monto (Se bloquea si el precio viene directo de Ajustes) */}
             <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
                 Monto ($)
@@ -188,27 +253,16 @@ useEffect(() => {
                 onChange={(e) => setMonto(e.target.value)}
                 placeholder="0"
                 required
-                className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm placeholder:text-slate-700"
+                disabled={servicioId !== "custom" && servicioId !== ""}
+                className={`w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm placeholder:text-slate-700 ${
+                  servicioId !== "custom" && servicioId !== "" ? "opacity-60 cursor-not-allowed text-amber-500" : ""
+                }`}
               />
             </div>
           </div>
 
-          {/* Concepto */}
-          <div>
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
-              Concepto
-            </label>
-            <input
-              type="text"
-              value={concepto}
-              onChange={(e) => setConcepto(e.target.value)}
-              placeholder="Ej: Corte, Barba, Tintura..."
-              className="w-full px-4 py-3 bg-[#12141a] border border-slate-800 rounded-2xl focus:border-amber-500 outline-none transition-all font-bold text-slate-200 text-sm placeholder:text-slate-700"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
-            {/* Método */}
+            {/* Método de Pago */}
             <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
                 Método
@@ -226,7 +280,7 @@ useEffect(() => {
               </select>
             </div>
 
-            {/* Estado */}
+            {/* Estado del Pago */}
             <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
                 Estado
@@ -243,7 +297,7 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Acciones */}
+          {/* Botones de Acción */}
           <div className="flex flex-col gap-3 pt-4 border-t border-slate-800">
             <div className="flex gap-3">
               <button

@@ -15,6 +15,7 @@ import PacientesPage from "../features/pacientes/pages/PacientesPage";
 import HistorialPacientePage from "../features/pacientes/pages/HistorialPacientePage";
 import PagosPage from "../features/pagos/pages/PagosPage";
 import StockPage from "@/features/stock/pages/StockPage";
+import AjustesPage from "@/features/ajustes/pages/ajustesPage";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/pacientes/:id/historial" element={<HistorialPacientePage />} />
             <Route path="/pagos" element={<PagosPage />} />
             <Route path="/stock" element={<StockPage/>} />
+            <Route path="/ajustes" element={<AjustesPage />} />
           </Route>
         </Route>
 

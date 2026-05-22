@@ -5,10 +5,19 @@ import {
 } from "firebase/firestore";
 import type { Pago } from "./payments.api";
 
+export type ServicioHecho = {
+  nombre: string;
+  cantidad: number;
+  monto: number;
+};
+
 export type ResumenBarbero = {
   nombre: string;
   cortes: number;
   total: number;
+  comision: number;
+  ingresoNeto: number;
+  servicios?: ServicioHecho[];
 };
 
 export type CierreCaja = {
@@ -30,18 +39,39 @@ export async function cerrarCaja(pagosAbiertos: Pago[]): Promise<CierreCaja> {
   const porBarbero: Record<string, ResumenBarbero> = {};
   for (const p of aprobados) {
     const nombreCrudo = p.barbero?.trim() || "Sin asignar";
-    // Forzamos minúsculas para la clave del objeto para unificar "Franco" y "franco"
-    const key = nombreCrudo.toLowerCase(); 
+    const key = nombreCrudo.toLowerCase();
 
     if (!porBarbero[key]) {
       porBarbero[key] = { 
-        nombre: nombreCrudo, // Guardamos el nombre original con sus mayúsculas
+        nombre: nombreCrudo,
         cortes: 0, 
-        total: 0 
+        total: 0,
+        comision: 0,
+        ingresoNeto: 0,
+        servicios: []
       };
     }
     porBarbero[key].cortes += 1;
     porBarbero[key].total += Number(p.monto) || 0;
+    
+    // Calcular comisión basada en commissionPercentage si existe
+    const comisionPorcentaje = p.comisionBarbero ? ((p.comisionBarbero / (Number(p.monto) || 1)) * 100) : 0;
+    porBarbero[key].comision += p.comisionBarbero || 0;
+    porBarbero[key].ingresoNeto = porBarbero[key].total - porBarbero[key].comision;
+    
+    // Acumular servicios
+    const nombreServicio = p.concepto || "Otro servicio";
+    const servicioExistente = porBarbero[key].servicios?.find(s => s.nombre === nombreServicio);
+    if (servicioExistente) {
+      servicioExistente.cantidad += 1;
+      servicioExistente.monto += Number(p.monto) || 0;
+    } else {
+      porBarbero[key].servicios?.push({
+        nombre: nombreServicio,
+        cantidad: 1,
+        monto: Number(p.monto) || 0
+      });
+    }
   }
 
   const now = new Date();

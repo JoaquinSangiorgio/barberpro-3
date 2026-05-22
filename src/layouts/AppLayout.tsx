@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  Users, CalendarDays, DollarSign, LogOut, BarChart4, ClipboardList,
+  Users, CalendarDays, DollarSign, LogOut, BarChart4, ClipboardList, WrenchIcon
 } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import PWAPrompt from "@/shared/components/PWAPrompt";
@@ -15,6 +15,7 @@ export default function AppLayout() {
     { to: "/pacientes", label: "Clientes", icon: <Users size={22} /> },
     { to: "/pagos", label: "Pagos", icon: <DollarSign size={22} /> },
     { to: "/stock", label: "Stock", icon: <ClipboardList size={22} /> },
+    { to: "/ajustes", label: "Ajustes", icon: <WrenchIcon size={22} /> },
   ];
 
   function handleLogout() {

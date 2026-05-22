@@ -8,6 +8,7 @@ import {
 } from "../services/payments.api";
 import { listPacientes, type Paciente } from "../../pacientes/services/pacientes.api";
 import { listBarberos, type Barbero } from "../services/barberos.api";
+import { ajustesService, type ServicioBarberia } from "../../ajustes/services/ajustesService";
 import PaymentDialog from "../components/PaymentDialog";
 import CierreCajaDialog from "../components/CierreCajaDialog";
 import HistorialCierresDialog from "../components/HistorialCierresDialog";
@@ -24,12 +25,13 @@ export default function PagosPage() {
   const [historialOpen, setHistorialOpen] = useState(false);
   const [patientsLite, setPatientsLite] = useState<PacienteLite[]>([]);
   const [barberos, setBarberos] = useState<Barbero[]>([]);
+  const [servicios, setServicios] = useState<ServicioBarberia[]>([]);
   const [q, setQ] = useState("");
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  const [filterMode, setFilterMode] = useState<"all" | "today" | "month">("all");
+  const [filterMode, setFilterMode] = useState<"all" | "today" | "month" | "open" | "closed">("all");
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -74,6 +76,15 @@ export default function PagosPage() {
     }
   }
 
+  async function loadServicios() {
+    try {
+      const svcs = await ajustesService.getServicios();
+      setServicios(svcs);
+    } catch {
+      // silencioso — servicios opcionales
+    }
+  }
+
   async function refresh() {
     try {
       const pagos = await listPagos();
@@ -87,6 +98,7 @@ export default function PagosPage() {
     void refresh();
     void loadPatients();
     void loadBarberos();
+    void loadServicios();
   }, []);
 
 
@@ -181,6 +193,10 @@ export default function PagosPage() {
       result = result.filter((p) => p.fecha?.slice(0, 10) === todayStr && p.status === "approved");
     } else if (filterMode === "month") {
       result = result.filter((p) => p.fecha?.slice(0, 7) === selectedMonth);
+    } else if (filterMode === "open") {
+      result = result.filter((p) => !p.cerrado);
+    } else if (filterMode === "closed") {
+      result = result.filter((p) => p.cerrado && p.fecha?.slice(0, 10) === todayStr);
     }
 
     return result;
@@ -211,7 +227,7 @@ export default function PagosPage() {
               <Activity className="w-9 h-9 text-amber-500" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-amber-500 uppercase">Finanzas</h1>
+              <h1 className="text-3xl font-black tracking-tight text-amber-500 uppercase">PAGOS</h1>
               <p className="text-slate-400 font-medium text-sm">Gestión de ingresos</p>
             </div>
           </motion.div>
@@ -257,7 +273,7 @@ export default function PagosPage() {
 
             {/* Row 2: filtros */}
             <div className="flex flex-wrap items-center gap-2">
-              {(["all", "today", "month"] as const).map((mode) => (
+              {(["all", "today", "month", "open", "closed"] as const).map((mode) => (
                 <button
                   key={mode}
                   onClick={() => setFilterMode(mode)}
@@ -267,7 +283,7 @@ export default function PagosPage() {
                       : "bg-[#12141a] text-slate-400 border-slate-800 hover:border-amber-500/40 hover:text-slate-200"
                   }`}
                 >
-                  {mode === "all" ? "Todos" : mode === "today" ? "Hoy" : "Por mes"}
+                  {mode === "all" ? "Todos" : mode === "today" ? "Hoy" : mode === "month" ? "Por mes" : mode === "open" ? "Abiertos" : "Cerrados Hoy"}
                 </button>
               ))}
               {filterMode === "month" && (
@@ -278,7 +294,7 @@ export default function PagosPage() {
                   className="px-4 py-2 rounded-xl bg-[#12141a] border border-slate-800 text-slate-200 focus:border-amber-500 outline-none text-xs font-bold transition-all"
                 />
               )}
-              {filterMode !== "all" && (
+              {filterMode !== "all" && filterMode !== "open" && filterMode !== "closed" && (
                 <div className="flex items-center gap-2 bg-emerald-900/20 border border-emerald-500/20 px-4 py-2 rounded-xl">
                   <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                   <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Aprobado:</span>
@@ -344,8 +360,27 @@ export default function PagosPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex justify-center gap-1">
-                        <button onClick={() => { setEditing(p); setOpen(true); }} className="p-2 text-amber-500 hover:bg-[#12141a] border border-transparent hover:border-slate-800 rounded-xl transition-colors text-xs font-bold">Editar</button>
-                        <button onClick={() => askDelete(p.id)} className="p-2 text-rose-400 hover:bg-[#12141a] border border-transparent hover:border-slate-800 rounded-xl transition-colors text-xs font-bold">Borrar</button>
+                        <button 
+                          onClick={() => { 
+                            if (!p.cerrado) { 
+                              setEditing(p); 
+                              setOpen(true); 
+                            } else {
+                              toast.error("No se puede editar pagos cerrados ❌");
+                            }
+                          }} 
+                          disabled={p.cerrado}
+                          className={`p-2 border border-transparent rounded-xl transition-colors text-xs font-bold ${p.cerrado ? "text-slate-600 cursor-not-allowed opacity-50" : "text-amber-500 hover:bg-[#12141a] hover:border-slate-800"}`}
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => askDelete(p.id)} 
+                          disabled={p.cerrado}
+                          className={`p-2 border border-transparent rounded-xl transition-colors text-xs font-bold ${p.cerrado ? "text-slate-600 cursor-not-allowed opacity-50" : "text-rose-400 hover:bg-[#12141a] hover:border-slate-800"}`}
+                        >
+                          Borrar
+                        </button>
                       </div>
                     </td>
                   </motion.tr>
@@ -398,7 +433,20 @@ export default function PagosPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-xl font-black text-slate-100">${Number(p.monto).toLocaleString("es-AR")}</span>
                   <div className="flex gap-2">
-                    <button onClick={() => { setEditing(p); setOpen(true); }} className="bg-[#12141a] border border-slate-800 px-3 py-2 rounded-xl text-xs font-bold text-slate-300">Editar</button>
+                    <button 
+                      onClick={() => { 
+                        if (!p.cerrado) { 
+                          setEditing(p); 
+                          setOpen(true); 
+                        } else {
+                          toast.error("No se puede editar pagos cerrados ❌");
+                        }
+                      }} 
+                      disabled={p.cerrado}
+                      className={`px-3 py-2 rounded-xl text-xs font-bold ${p.cerrado ? "bg-slate-900/30 border border-slate-800 text-slate-600 cursor-not-allowed opacity-50" : "bg-[#12141a] border border-slate-800 text-slate-300 hover:border-amber-500"}`}
+                    >
+                      Editar
+                    </button>
                     <button onClick={() => askDelete(p.id)} className="bg-rose-950/20 border border-rose-900/20 px-3 py-2 rounded-xl text-xs font-bold text-rose-400">Borrar</button>
                   </div>
                 </div>
@@ -419,6 +467,7 @@ export default function PagosPage() {
             initial={editing}
             pacientes={patientsLite}
             barberos={barberos}
+            servicios={servicios}
             onSave={handleSave}
             onDelete={editing ? (id) => askDelete(String(id)) : undefined}
             onCancel={() => { setOpen(false); setEditing(undefined); }}

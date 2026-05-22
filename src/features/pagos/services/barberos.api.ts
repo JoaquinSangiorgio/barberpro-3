@@ -6,18 +6,28 @@ import {
 
 export type Barbero = {
   id: string;
-  nombre: string;
+  name: string;
+  commissionPercentage: number;
+  isActive: boolean;
 };
 
 export async function listBarberos(): Promise<Barbero[]> {
-  const q = query(collection(db, "barberos"), orderBy("nombre", "asc"));
+  const q = query(collection(db, "barberos"), orderBy("name", "asc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Barbero, "id">) }));
+  return snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      name: data.name || "",
+      commissionPercentage: data.commissionPercentage ?? 50,
+      isActive: data.isActive ?? true,
+    };
+  });
 }
 
 export async function createBarbero(nombre: string): Promise<Barbero> {
-  const ref = await addDoc(collection(db, "barberos"), { nombre });
-  return { id: ref.id, nombre };
+  const ref = await addDoc(collection(db, "barberos"), { name: nombre, commissionPercentage: 50, isActive: true });
+  return { id: ref.id, name: nombre, commissionPercentage: 50, isActive: true };
 }
 
 export async function deleteBarbero(id: string): Promise<void> {

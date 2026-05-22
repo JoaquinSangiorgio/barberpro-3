@@ -51,15 +51,31 @@ export default function CierreCajaDialog({
 
   // Solo aprobados para el resumen económico
   const resumen = useMemo(() => {
-    const porBarbero: Record<string, { cortes: number; total: number }> = {};
+    const porBarbero: Record<string, { cortes: number; total: number; servicios: Record<string, { nombre: string; cantidad: number; monto: number }> }> = {};
     for (const p of pagosAbiertos) {
       if (p.status !== "approved") continue;
       const nombre = p.barbero?.trim() || "Sin asignar";
-      if (!porBarbero[nombre]) porBarbero[nombre] = { cortes: 0, total: 0 };
+      if (!porBarbero[nombre]) {
+        porBarbero[nombre] = { cortes: 0, total: 0, servicios: {} };
+      }
       porBarbero[nombre].cortes += 1;
       porBarbero[nombre].total += Number(p.monto);
+      
+      // Acumular servicios
+      const nombreServicio = p.concepto || "Otro servicio";
+      if (porBarbero[nombre].servicios[nombreServicio]) {
+        porBarbero[nombre].servicios[nombreServicio].cantidad += 1;
+        porBarbero[nombre].servicios[nombreServicio].monto += Number(p.monto);
+      } else {
+        porBarbero[nombre].servicios[nombreServicio] = { nombre: nombreServicio, cantidad: 1, monto: Number(p.monto) };
+      }
     }
-    return Object.entries(porBarbero).map(([nombre, v]) => ({ nombre, ...v }));
+    return Object.entries(porBarbero).map(([nombre, v]) => ({ 
+      nombre, 
+      cortes: v.cortes, 
+      total: v.total,
+      servicios: Object.values(v.servicios)
+    }));
   }, [pagosAbiertos]);
 
   const totalGeneral = useMemo(
@@ -138,7 +154,7 @@ export default function CierreCajaDialog({
             </div>
             <div>
               <h2 className="text-base font-black text-slate-100 uppercase tracking-wide">Cierre de Caja</h2>
-              <p className="text-[10px] text-slate-500 capitalize">{todayLabel}</p>
+              <p className="text-[12px] text-slate-200 capitalize">{todayLabel}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors p-1">
@@ -163,12 +179,35 @@ export default function CierreCajaDialog({
               </div>
               <div className="bg-[#12141a] rounded-2xl border border-slate-800 p-5 text-left space-y-3">
                 {cierreHecho.barberos.map((b) => (
-                  <div key={b.nombre} className="flex justify-between items-center">
-                    <span className="text-sm font-bold text-slate-300">{b.nombre}</span>
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="text-slate-500">{b.cortes} cortes</span>
+                  <div key={b.nombre} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-bold text-slate-300">{b.nombre}</span>
                       <span className="font-black text-slate-100">${b.total.toLocaleString("es-AR")}</span>
                     </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-500">{b.cortes} {b.cortes === 1 ? "servicio" : "servicios"}</span>
+                      {b.comision > 0 && (
+                        <span className="text-amber-400 font-bold">
+                          Comisión: ${b.comision.toLocaleString("es-AR")}
+                        </span>
+                      )}
+                    </div>
+                    {b.ingresoNeto && b.ingresoNeto > 0 && (
+                      <div className="text-xs text-slate-400 border-t border-slate-700/50 pt-1 mb-2">
+                        Ingreso neto: ${b.ingresoNeto.toLocaleString("es-AR")}
+                      </div>
+                    )}
+                    {b.servicios && b.servicios.length > 0 && (
+                      <div className="bg-[#0f1115] rounded-lg p-3 space-y-1 text-xs border border-slate-800/50">
+                        <p className="font-bold text-slate-400 uppercase tracking-wider">Servicios:</p>
+                        {b.servicios.map((svc, idx) => (
+                          <div key={idx} className="flex justify-between text-slate-400">
+                            <span>• {svc.nombre} x{svc.cantidad}</span>
+                            <span className="text-slate-300 font-bold">${svc.monto.toLocaleString("es-AR")}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div className="border-t border-slate-800 pt-3 flex justify-between items-center">
@@ -198,27 +237,38 @@ export default function CierreCajaDialog({
               {/* Cards por barbero */}
               {resumen.length > 0 && (
                 <>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {resumen.map((b, i) => (
                       <motion.div
                         key={b.nombre}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.05 }}
-                        className={`bg-gradient-to-br ${BARBER_COLORS[i % BARBER_COLORS.length]} border rounded-2xl p-4 space-y-2`}
+                        className={`bg-gradient-to-br ${BARBER_COLORS[i % BARBER_COLORS.length]} border rounded-2xl p-4 space-y-3`}
                       >
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-xl bg-black/20 flex items-center justify-center text-sm font-black">
                             {b.nombre.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-xs font-black uppercase tracking-wider leading-tight">{b.nombre}</span>
+                          <span className="text-xs font-black uppercase tracking-wider leading-tight flex-1">{b.nombre}</span>
+                          <span className="text-lg font-black text-slate-100">
+                            ${b.total.toLocaleString("es-AR")}
+                          </span>
                         </div>
-                        <div className="text-xl font-black text-slate-100">
-                          ${b.total.toLocaleString("es-AR")}
-                        </div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <div className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">
                           {b.cortes} {b.cortes === 1 ? "corte" : "cortes"}
                         </div>
+                        {b.servicios && b.servicios.length > 0 && (
+                          <div className="bg-black/20 rounded-lg p-2 space-y-1 text-[13px] border border-white/10">
+                            <p className="font-bold text-slate-100 uppercase tracking-wider">Servicios:</p>
+                            {b.servicios.map((svc, idx) => (
+                              <div key={idx} className="flex justify-between text-slate-300">
+                                <span>• {svc.nombre} ×{svc.cantidad}</span>
+                                <span>${svc.monto.toLocaleString("es-AR")}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </motion.div>
                     ))}
                   </div>
@@ -228,8 +278,8 @@ export default function CierreCajaDialog({
                     <div className="flex items-center gap-3">
                       <TrendingUp className="w-5 h-5 text-emerald-400" />
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total general</p>
-                        <p className="text-xs text-slate-500">{totalCortes} cortes · {pagosAbiertos.length} registros</p>
+                        <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Total general</p>
+                        <p className="text-md text-slate-500">{totalCortes} cortes · {pagosAbiertos.length} registros</p>
                       </div>
                     </div>
                     <span className="text-2xl font-black text-emerald-400">
@@ -239,63 +289,8 @@ export default function CierreCajaDialog({
                 </>
               )}
 
-              {/* Gestión de barberos */}
-              <div className="border border-slate-800 rounded-2xl overflow-hidden">
-                <button
-                  onClick={() => setGestionando((v) => !v)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-[#12141a] hover:bg-[#1d222e] transition-colors"
-                >
-                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Gestionar barberos</span>
-                  <span className="text-slate-600 text-sm">{gestionando ? "▲" : "▼"}</span>
-                </button>
-
-                <AnimatePresence>
-                  {gestionando && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-4 space-y-3">
-                        {/* Lista */}
-                        {barberos.length === 0 && (
-                          <p className="text-xs text-slate-600 italic">No hay barberos registrados</p>
-                        )}
-                        {barberos.map((b) => (
-                          <div key={b.id} className="flex items-center justify-between bg-[#12141a] px-3 py-2 rounded-xl border border-slate-800">
-                            <span className="text-sm font-bold text-slate-300">{b.nombre}</span>
-                            <button
-                              onClick={() => handleEliminarBarbero(b.id, b.nombre)}
-                              className="text-rose-400/60 hover:text-rose-400 transition-colors"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        ))}
-                        {/* Agregar */}
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={nuevoBarbero}
-                            onChange={(e) => setNuevoBarbero(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleAgregarBarbero()}
-                            placeholder="Nombre del barbero..."
-                            className="flex-1 px-3 py-2 bg-[#0f1115] border border-slate-800 rounded-xl text-slate-200 text-sm placeholder:text-slate-700 focus:border-amber-500 outline-none font-bold"
-                          />
-                          <button
-                            onClick={handleAgregarBarbero}
-                            disabled={agregando || !nuevoBarbero.trim()}
-                            className="px-3 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-white rounded-xl transition-colors"
-                          >
-                            <UserPlus size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              {/* Gestión de barberos quitado*/}
+              
             </div>
           )}
         </div>

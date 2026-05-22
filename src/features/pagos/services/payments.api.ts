@@ -21,8 +21,11 @@ export type Pago = {
   monto: number;
   status: "approved" | "pending" | "rejected";
   barbero?: string;
+  barberId?: string;
+  comisionBarbero?: number;
   cerrado?: boolean;
   cierre_id?: string;
+  serviceId?: string;
   created_at?: any;
   updated_at?: any;
 };

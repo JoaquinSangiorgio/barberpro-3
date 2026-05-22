@@ -7,6 +7,7 @@ import PagosPage from "../src/features/pagos/pages/PagosPage";
 import AgendaPage from "./features/agenda/pages/AgendaPage";
 import StockPage from "./features/stock/pages/StockPage";
 import ScrollToTop from "./shared/components/ScrollToTop";
+import AjustesPage from "./features/ajustes/pages/ajustesPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               <Route path="/pagos" element={<PagosPage />} />
               <Route path="/agenda" element={<AgendaPage />} />
               <Route path="/stock" element={<StockPage />} />
+              <Route path="/ajustes" element={<AjustesPage />} />
             </Routes>
           </div>
         </main>

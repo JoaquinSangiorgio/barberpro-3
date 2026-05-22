@@ -123,7 +123,7 @@ useEffect(() => {
                     >
                       <span className="font-black">{b.nombre}</span>
                       <span className="opacity-40">·</span>
-                      <span>{b.cortes} {b.cortes === 1 ? "corte" : "cortes"}</span>
+                      <span>{b.cortes} {b.cortes === 1 ? "Servicio" : "Servicios"}</span>
                       <span className="opacity-40">·</span>
                       <span>${b.total.toLocaleString("es-AR")}</span>
                     </div>
