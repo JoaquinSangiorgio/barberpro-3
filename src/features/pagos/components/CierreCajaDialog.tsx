@@ -279,7 +279,7 @@ export default function CierreCajaDialog({
                       <TrendingUp className="w-5 h-5 text-emerald-400" />
                       <div>
                         <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Total general</p>
-                        <p className="text-md text-slate-500">{totalCortes} cortes · {pagosAbiertos.length} registros</p>
+                        <p className="text-md text-slate-500">{totalCortes === 1 ? "1 servicio" : `${totalCortes} servicios`} · {pagosAbiertos.length === 1 ? "1 registro" : `${pagosAbiertos.length} registros`}</p>
                       </div>
                     </div>
                     <span className="text-2xl font-black text-emerald-400">
