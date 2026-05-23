@@ -18,6 +18,7 @@ export type ResumenBarbero = {
   comision: number;
   ingresoNeto: number;
   servicios?: ServicioHecho[];
+  fechas?: string[];
 };
 
 export type CierreCaja = {
@@ -48,11 +49,17 @@ export async function cerrarCaja(pagosAbiertos: Pago[]): Promise<CierreCaja> {
         total: 0,
         comision: 0,
         ingresoNeto: 0,
-        servicios: []
+        servicios: [],
+        fechas: []
       };
     }
     porBarbero[key].cortes += 1;
     porBarbero[key].total += Number(p.monto) || 0;
+    
+    // Acumular fechas únicas
+    if (p.fecha && !porBarbero[key].fechas?.includes(p.fecha)) {
+      porBarbero[key].fechas?.push(p.fecha);
+    }
     
     // Calcular comisión basada en commissionPercentage si existe
     const comisionPorcentaje = p.comisionBarbero ? ((p.comisionBarbero / (Number(p.monto) || 1)) * 100) : 0;
@@ -73,6 +80,11 @@ export async function cerrarCaja(pagosAbiertos: Pago[]): Promise<CierreCaja> {
       });
     }
   }
+  
+  // Ordenar fechas
+  Object.values(porBarbero).forEach(b => {
+    b.fechas?.sort();
+  });
 
   const now = new Date();
   const barberos = Object.values(porBarbero);

@@ -51,15 +51,16 @@ export default function CierreCajaDialog({
 
   // Solo aprobados para el resumen económico
   const resumen = useMemo(() => {
-    const porBarbero: Record<string, { cortes: number; total: number; servicios: Record<string, { nombre: string; cantidad: number; monto: number }> }> = {};
+    const porBarbero: Record<string, { cortes: number; total: number; servicios: Record<string, { nombre: string; cantidad: number; monto: number }>; fechas: Set<string> }> = {};
     for (const p of pagosAbiertos) {
       if (p.status !== "approved") continue;
       const nombre = p.barbero?.trim() || "Sin asignar";
       if (!porBarbero[nombre]) {
-        porBarbero[nombre] = { cortes: 0, total: 0, servicios: {} };
+        porBarbero[nombre] = { cortes: 0, total: 0, servicios: {}, fechas: new Set() };
       }
       porBarbero[nombre].cortes += 1;
       porBarbero[nombre].total += Number(p.monto);
+      porBarbero[nombre].fechas.add(p.fecha || "");
       
       // Acumular servicios
       const nombreServicio = p.concepto || "Otro servicio";
@@ -74,7 +75,8 @@ export default function CierreCajaDialog({
       nombre, 
       cortes: v.cortes, 
       total: v.total,
-      servicios: Object.values(v.servicios)
+      servicios: Object.values(v.servicios),
+      fechas: Array.from(v.fechas).sort()
     }));
   }, [pagosAbiertos]);
 
@@ -192,6 +194,11 @@ export default function CierreCajaDialog({
                         </span>
                       )}
                     </div>
+                    {b.fechas && b.fechas.length > 0 && (
+                      <div className="text-[11px] text-slate-400 bg-black/20 rounded-lg px-2 py-1">
+                        Fechas: {b.fechas.join(", ")}
+                      </div>
+                    )}
                     {b.ingresoNeto && b.ingresoNeto > 0 && (
                       <div className="text-xs text-slate-400 border-t border-slate-700/50 pt-1 mb-2">
                         Ingreso neto: ${b.ingresoNeto.toLocaleString("es-AR")}
@@ -256,8 +263,13 @@ export default function CierreCajaDialog({
                           </span>
                         </div>
                         <div className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">
-                          {b.cortes} {b.cortes === 1 ? "corte" : "cortes"}
+                          {b.cortes} {b.cortes === 1 ? "servicio" : "servicios"}
                         </div>
+                        {b.fechas && b.fechas.length > 0 && (
+                          <div className="text-[11px] text-slate-400 bg-black/20 rounded-lg px-2 py-1">
+                            Fechas: {b.fechas.join(", ")}
+                          </div>
+                        )}
                         {b.servicios && b.servicios.length > 0 && (
                           <div className="bg-black/20 rounded-lg p-2 space-y-1 text-[13px] border border-white/10">
                             <p className="font-bold text-slate-100 uppercase tracking-wider">Servicios:</p>
