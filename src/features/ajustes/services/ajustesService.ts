@@ -1,4 +1,4 @@
-import { db } from "../../../../../frontend/services/firebaseConfig";
+import { db } from "../../../../services/firebaseConfig";
 import { 
   collection, 
   addDoc, 
