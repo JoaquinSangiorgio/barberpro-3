@@ -45,6 +45,7 @@ useEffect(() => {
   }, []);
 
   return (
+    
     <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
@@ -53,9 +54,9 @@ useEffect(() => {
         className="bg-[#161920] w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col"
       >
         {/* Drag bar mobile */}
-        <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="w-10 h-1 rounded-full bg-slate-700" />
-        </div>
+       <br></br>
+       <br></br>
+       <br></br>
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-800 bg-[#12141a] flex items-center justify-between shrink-0">
@@ -73,7 +74,7 @@ useEffect(() => {
             </div>
           </div>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors p-1">
-            <X size={20} />
+            <X size={30} />
           </button>
         </div>
 
