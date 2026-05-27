@@ -38,17 +38,6 @@ export default function CierreCajaDialog({
   const pagosAbiertos = useMemo(() => pagos.filter((p) => !p.cerrado), [pagos]);
 
 
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    
-    document.body.style.overflow = "hidden";
-  
-    return () => {
-      document.body.style.overflow = originalStyle;
-    };
-  }, []);
-
-
   // Solo aprobados para el resumen económico
   const resumen = useMemo(() => {
     const porBarbero: Record<string, { cortes: number; total: number; servicios: Record<string, { nombre: string; cantidad: number; monto: number }>; fechas: Set<string> }> = {};
@@ -310,6 +299,7 @@ export default function CierreCajaDialog({
         {/* Footer con acción */}
         {!cierreHecho && (
           <div className="p-5 border-t border-slate-800 shrink-0">
+            
             {!confirmando ? (
               <button
                 onClick={() => setConfirmando(true)}
@@ -319,6 +309,7 @@ export default function CierreCajaDialog({
                 <Lock size={16} />
                 Cerrar Caja
               </button>
+              
             ) : (
               <div className="space-y-3">
                 <p className="text-center text-sm text-slate-400 font-bold">
@@ -342,6 +333,7 @@ export default function CierreCajaDialog({
                 </div>
               </div>
             )}
+            <br />
           </div>
         )}
       </motion.div>

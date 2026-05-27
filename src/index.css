@@ -15,6 +15,7 @@
   --text: 222 47% 11%;
   --text-soft: 222 10% 35%;
   --text-muted: 222 8% 50%;
+  
 }
 .dark{
   --bg: 222 20% 10%;
@@ -50,4 +51,8 @@
 }
 input, select, textarea {
   font-size: 16px !important; 
+}
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }

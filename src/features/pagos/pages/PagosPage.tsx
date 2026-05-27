@@ -101,8 +101,19 @@ export default function PagosPage() {
     void loadServicios();
   }, []);
 
+  // Control centralizado del bloqueo de scroll cuando hay dialogs abiertos
+  useEffect(() => {
+    if (open || cierreOpen || historialOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open, cierreOpen, historialOpen]);
 
-    // Cuando cambie el estado de la sección, mandamos el scroll al tope  
+  // Cuando cambie el estado de la sección, mandamos el scroll al tope  
     useEffect(() => {
     
       window.scrollTo({

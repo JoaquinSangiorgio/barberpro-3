@@ -31,6 +31,20 @@ export default function StockModal({ isOpen, onClose, onSave, initialData }: Pro
     }
   }, [isOpen, initialData]);
 
+
+      //bloqueo de scroll de pagina al abrir dialog
+      useEffect(() => {
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        
+        document.body.style.overflow = "hidden";
+
+        return () => {
+          document.body.style.overflow = originalStyle;
+        };
+      }, []);
+
+
+
   // 🛠️ Función mágica para que puedas borrar el "0" sin problemas
   const handleNumberChange = (field: "cantidad" | "minimo", value: string) => {
     if (value === "") {

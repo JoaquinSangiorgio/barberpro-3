@@ -23,6 +23,9 @@ export default function ModalBarbero({ isOpen, onClose, onSave, initialData, isE
     }
   }, [isOpen, initialData, isEditing]);
 
+
+    
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {

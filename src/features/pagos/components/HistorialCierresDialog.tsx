@@ -28,17 +28,6 @@ export default function HistorialCierresDialog({ onClose }: Props) {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  //bloqueo de scroll de pagina al abrir dialog
-useEffect(() => {
-  const originalStyle = window.getComputedStyle(document.body).overflow;
-  
-  document.body.style.overflow = "hidden";
-
-  return () => {
-    document.body.style.overflow = originalStyle;
-  };
-}, []);
-
   useEffect(() => {
     listCierres()
       .then(setCierres)
@@ -203,6 +192,8 @@ useEffect(() => {
           >
             Cerrar
           </button>
+          <br />
+          <br />
         </div>
       </motion.div>
     </div>

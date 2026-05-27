@@ -42,7 +42,7 @@ export default function PaymentDialog({
     return "";
   });
 
-  // Bloqueo de scroll del body al abrir el diálogo (Crucial para UX en tablets)
+  // Bloqueo de scroll del body al abrir el diálogo 
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
@@ -50,6 +50,9 @@ export default function PaymentDialog({
       document.body.style.overflow = originalStyle;
     };
   }, []);
+
+ 
+  
 
   // Sincronización al editar un registro existente
   useEffect(() => {
@@ -296,6 +299,7 @@ export default function PaymentDialog({
               </select>
             </div>
           </div>
+       
 
           {/* Botones de Acción */}
           <div className="flex flex-col gap-3 pt-4 border-t border-slate-800">
@@ -307,6 +311,7 @@ export default function PaymentDialog({
               >
                 Cancelar
               </button>
+              
               <button
                 type="submit"
                 className="flex-1 px-4 py-3 rounded-2xl bg-amber-600 text-white font-bold hover:bg-amber-500 shadow-lg shadow-amber-950/40 border border-amber-500/15 transition-all active:scale-95 text-sm uppercase tracking-wider"
@@ -314,6 +319,7 @@ export default function PaymentDialog({
                 Guardar
               </button>
             </div>
+             <br />
 
             {initial && onDelete && (
               <button

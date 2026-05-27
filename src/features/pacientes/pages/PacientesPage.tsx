@@ -202,7 +202,7 @@ export default function PacientesPage() {
                <div key={p.id} className="bg-[#12141a] p-6 rounded-3xl border border-slate-800/60 space-y-4">
                  <div>
                    <h3 className="font-black text-slate-200 text-lg">{p.nombre} {p.apellido}</h3>
-                   <p className="text-xs font-bold text-slate-500">DNI: {p.dni}</p>
+                   <p className="text-xs font-bold text-slate-500">Teléfono: {p.telefono}</p>
                  </div>
                  <div className="flex gap-2">
                    <button onClick={() => { setEditing(p); setShowModal(true); }} className="flex-1 py-3 bg-[#161920] border border-slate-800 rounded-xl font-bold text-slate-300">Editar</button>
