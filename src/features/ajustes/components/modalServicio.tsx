@@ -39,8 +39,8 @@ export default function ModalServicio({ isOpen, onClose, onSave, initialData, is
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#161920] border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm pointer-events-none touch-none">
+      <div className="bg-[#161920] border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl pointer-events-auto" style={{ touchAction: 'none' }}>
         <h3 className="text-lg font-black text-slate-100 uppercase tracking-wider mb-4">
           {isEditing ? "Editar Servicio" : "Crear Servicio"}
         </h3>

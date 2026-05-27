@@ -32,16 +32,7 @@ export default function StockModal({ isOpen, onClose, onSave, initialData }: Pro
   }, [isOpen, initialData]);
 
 
-      //bloqueo de scroll de pagina al abrir dialog
-      useEffect(() => {
-        const originalStyle = window.getComputedStyle(document.body).overflow;
-        
-        document.body.style.overflow = "hidden";
-
-        return () => {
-          document.body.style.overflow = originalStyle;
-        };
-      }, []);
+       //bloqueo de scroll de pagina al abrir dialog - removido, controlado por el padre
 
 
 
@@ -74,12 +65,13 @@ export default function StockModal({ isOpen, onClose, onSave, initialData }: Pro
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm pointer-events-none touch-none">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-[#161920] w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-800/80 overflow-hidden relative"
+            className="bg-[#161920] w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-800/80 overflow-hidden relative pointer-events-auto"
+            style={{ touchAction: 'none' }}
           >
             <div className="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
 

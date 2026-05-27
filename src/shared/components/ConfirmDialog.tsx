@@ -23,16 +23,17 @@ export default function ConfirmDialog({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999]"
+          className="fixed inset-0 bg-black/40 flex justify-center items-center z-[999] pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white w-full max-w-sm rounded-xl shadow-xl p-6 space-y-4"
+            className="bg-white w-full max-w-sm rounded-xl shadow-xl p-6 space-y-4 pointer-events-auto"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
+            style={{ touchAction: 'none' }}
           >
             <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
             <p className="text-gray-600">{message}</p>

@@ -42,16 +42,7 @@ export default function PaymentDialog({
     return "";
   });
 
-  // Bloqueo de scroll del body al abrir el diálogo 
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalStyle;
-    };
-  }, []);
 
- 
   
 
   // Sincronización al editar un registro existente
@@ -132,8 +123,8 @@ export default function PaymentDialog({
     : barberos.filter(b => b.isActive);
 
   return (
-    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4">
-      <div className="bg-[#161920] w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 relative max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col">
+    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4 pointer-events-none touch-none">
+      <div className="bg-[#161920] w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 relative max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col pointer-events-auto" style={{ touchAction: 'none' }}>
         <div className="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
 
         {/* Indicador visual táctil para celulares */}

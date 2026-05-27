@@ -22,6 +22,18 @@ export default function AjustesPage() {
     cargarDatos();
   }, []);
 
+  // Control centralizado del bloqueo de scroll cuando hay modales abiertos
+  useEffect(() => {
+    if (isBarberModalOpen || isServiceModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isBarberModalOpen, isServiceModalOpen]);
+
   async function cargarDatos() {
     try {
       const [listaBarberos, listaServicios] = await Promise.all([

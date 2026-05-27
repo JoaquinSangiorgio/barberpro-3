@@ -125,12 +125,13 @@ export default function CierreCajaDialog({
   }
 
   return (
-    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4">
+    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm z-50 p-0 sm:p-4 pointer-events-none touch-none">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 60 }}
-        className="bg-[#161920] w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col"
+        className="bg-[#161920] w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl border border-slate-800/80 overflow-hidden max-h-[calc(100dvh-76px)] mb-[76px] sm:mb-0 flex flex-col pointer-events-auto"
+        style={{ touchAction: 'none' }}
       >
         {/* Barra de arrastre mobile */}
         <div className="flex justify-center pt-5 pb-2 sm:hidden">

@@ -99,6 +99,18 @@ export default function AgendaPage() {
   }, []);
 
 
+  // Control centralizado del bloqueo de scroll cuando hay modales abiertos
+  useEffect(() => {
+    if (showModal || confirmOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showModal, confirmOpen]);
+
    // Cuando cambie el estado de la sección, mandamos el scroll al tope  
 useEffect(() => {
  
@@ -323,13 +335,14 @@ useEffect(() => {
       {/* MODAL RESPONSIVO FORMULARIO BARBER (Bottom sheet en mobile, Centrado en desktop) */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 bg-slate-950/80 backdrop-blur-sm pointer-events-none touch-none">
             <motion.div 
               initial={{ y: "100%" }} 
               animate={{ y: 0 }} 
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className="bg-[#161920] border-t md:border border-slate-800 w-full max-w-lg rounded-t-2xl md:rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto relative"
+              className="bg-[#161920] border-t md:border border-slate-800 w-full max-w-lg rounded-t-2xl md:rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto relative pointer-events-auto"
+              style={{ touchAction: 'none' }}
             >
               <div className="absolute top-0 left-6 right-6 h-[2px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
               

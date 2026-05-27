@@ -86,16 +86,7 @@ export default function AppointmentDialog({
   const [err, setErr] = useState<string | null>(null);
 
 
-   //bloqueo de scroll de pagina al abrir dialog
-useEffect(() => {
-  const originalStyle = window.getComputedStyle(document.body).overflow;
-  
-  document.body.style.overflow = "hidden";
-
-  return () => {
-    document.body.style.overflow = originalStyle;
-  };
-}, []);
+   //bloqueo de scroll de pagina al abrir dialog - removido, controlado por el padre
 
 
 
@@ -160,11 +151,12 @@ useEffect(() => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none touch-none">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto" onClick={onClose} />
       <form
         onSubmit={handleSubmit}
-        className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
+        className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200 pointer-events-auto"
+        style={{ touchAction: 'none' }}
       >
         <div className="mb-6 flex items-center justify-between border-b pb-4">
           <h2 className="text-xl font-bold text-slate-800">
